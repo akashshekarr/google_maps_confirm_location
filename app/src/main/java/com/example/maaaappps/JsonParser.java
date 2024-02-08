@@ -8,10 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 public class JsonParser {
-    private HashMap<String,String> parseJsonObject(JSONObject object) throws JSONException {
+
+    private HashMap<String, String> parseJsonObject(JSONObject object) throws JSONException {
         HashMap<String, String> dataList = new HashMap<>();
         try {
             String name = object.getString("name");
@@ -19,47 +18,47 @@ public class JsonParser {
                     .getJSONObject("location").getString("lat");
             String longitude = object.getJSONObject("geometry")
                     .getJSONObject("location").getString("lng");
-            dataList.put("name",name);
-            dataList.put("lat",latitude);
-            dataList.put("lng",longitude);
+            dataList.put("name", name);
+            dataList.put("lat", latitude);
+            dataList.put("lng", longitude);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        System.out.println(dataList);
         return dataList;
-
     }
 
-    private List<HashMap<String,String>> parseJsonArray(JSONArray jsonArray){
-
-        List<HashMap<String,String>> dataList = new ArrayList<>();
-        for (int i=0; i<jsonArray.length(); i++){
+    private List<HashMap<String, String>> parseJsonArray(JSONArray jsonArray) {
+        List<HashMap<String, String>> dataList = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                HashMap<String,String> data = parseJsonObject((JSONObject) jsonArray.get(i));
+                HashMap<String, String> data = parseJsonObject(jsonArray.getJSONObject(i));
                 dataList.add(data);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
         return dataList;
     }
 
-    public List<HashMap<String,String>> parseResult(JSONObject object){
-        JSONArray jsonArray =null;
+    public List<HashMap<String, String>> parseResult(JSONObject object) {
         try {
-            jsonArray =object.getJSONArray("results");
+            JSONArray jsonArray = object.getJSONArray("results");
+            return parseJsonArray(jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
-        assert jsonArray != null;
-        return parseJsonArray(jsonArray);
     }
 
+    // Updated method to handle parsing from a string
     public List<HashMap<String, String>> parseResult(String s) {
-        return null;
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            return parseResult(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
-
-
